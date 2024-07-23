@@ -10,6 +10,7 @@ import com.hafidtech.api_gunungcondongcom.repository.UserRepository;
 import com.hafidtech.api_gunungcondongcom.response.ApiResponse;
 import com.hafidtech.api_gunungcondongcom.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -24,22 +25,26 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public User addUser(User user) {
-        if (userRepository.existsByUsername(user.getUsername())) {
-            ApiResponse apiResponse = new ApiResponse(Boolean.FALSE, "Username is already taken");
-            throw new BadRequestException(apiResponse);
-        }
-        if (userRepository.existsByEmail(user.getEmail())) {
-            ApiResponse apiResponse = new ApiResponse(Boolean.FALSE, "Email is already taken");
-            throw new BadRequestException(apiResponse);
-        }
+        List<Role> roles = new ArrayList<>();
+        roles.add(roleRepository.findByName(RoleName.ROLE_USER).orElseThrow(() -> new AppException("User role not set")));
+        user.setRoles(roles);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
+    }
 
+
+    @Override
+    public User addAdmin(User user) {
         List<Role> roles = new ArrayList<>();
         roles.add(roleRepository.findByName(RoleName.ROLE_ADMIN).orElseThrow(() -> new AppException("User role not set")));
         user.setRoles(roles);
 
-        user.setPassword(user.getPassword());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 }

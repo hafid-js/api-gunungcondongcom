@@ -5,4 +5,6 @@ import com.hafidtech.api_gunungcondongcom.model.user.User;
 public interface UserService {
     User addUser(User user);
 
+    User addAdmin(User user);
+
 }

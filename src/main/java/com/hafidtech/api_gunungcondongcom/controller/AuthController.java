@@ -1,11 +1,13 @@
 package com.hafidtech.api_gunungcondongcom.controller;
 
 import com.hafidtech.api_gunungcondongcom.config.JwtProvider;
+import com.hafidtech.api_gunungcondongcom.exception.BadRequestException;
 import com.hafidtech.api_gunungcondongcom.exception.UserException;
 import com.hafidtech.api_gunungcondongcom.model.user.User;
 import com.hafidtech.api_gunungcondongcom.repository.UserRepository;
+import com.hafidtech.api_gunungcondongcom.request.LoginRequest;
+import com.hafidtech.api_gunungcondongcom.response.ApiResponse;
 import com.hafidtech.api_gunungcondongcom.response.AuthResponse;
-import com.hafidtech.api_gunungcondongcom.response.CommonResponseBean;
 import com.hafidtech.api_gunungcondongcom.response.LoginResponse;
 import com.hafidtech.api_gunungcondongcom.service.UserService;
 import com.hafidtech.api_gunungcondongcom.service.impl.CustomerUserServiceImpl;
@@ -21,11 +23,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
+import java.awt.*;
 
 @RestController
-@RequestMapping("/api/admin")
-public class UserController {
+@RequestMapping("/api/auth")
+public class AuthController {
 
     @Autowired
     private UserService userService;
@@ -38,27 +40,29 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+
     @PostMapping("/signup")
-    public ResponseEntity<Object> addUser(@Valid @RequestBody User user) throws UserException {
+    @ResponseBody
+    public ResponseEntity<AuthResponse> addUser(@Valid @RequestBody User user) throws UserException {
+
         if (userRepository.existsByUsername(user.getUsername())) {
             throw new UserException("Username is already used with another account");
         }
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new UserException("Email is already used with another account");
         }
-        User newUser = userService.addAdmin(user);
+        User newUser = userService.addUser(user);
 
         AuthResponse authResponse = new AuthResponse();
         authResponse.setUser(newUser);
-        authResponse.setMessage("Success Add Admin!");
-
-        return new ResponseEntity<>(authResponse, HttpStatus.CREATED);
+        authResponse.setMessage("Signup success! Please Login");
+        return new ResponseEntity<AuthResponse>(authResponse,HttpStatus.CREATED);
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<LoginResponse> loginUserHandler(@RequestBody User user) {
-        String username = user.getUsername();
-        String password = user.getPassword();
+    public ResponseEntity<LoginResponse> loginUserHandler(@Valid @RequestBody LoginRequest loginRequest) {
+        String username = loginRequest.getEmail();
+        String password = loginRequest.getPassword();
 
         Authentication authentication = authenticate(username, password);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -87,6 +91,5 @@ public class UserController {
 
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
-
 
 }

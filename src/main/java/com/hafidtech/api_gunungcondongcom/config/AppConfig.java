@@ -26,7 +26,8 @@ public class AppConfig {
                 .and()
 
                 .authorizeHttpRequests(Authorize -> Authorize
-                        .requestMatchers(HttpMethod.POST, "/api/user/signup").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/admin/**").permitAll()
                         .requestMatchers("/api/**").authenticated().anyRequest().permitAll()
                 )
                 .addFilterBefore(new JwtValidator(), BasicAuthenticationFilter.class).csrf().disable()
