@@ -1,4 +1,4 @@
-package com.hafidtech.api_gunungcondongcom.model.role;
+package com.hafidtech.api_gunungcondongcom.model.user.role;
 
 import jakarta.persistence.*;
 import lombok.Data;

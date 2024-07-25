@@ -1,13 +1,13 @@
 package com.hafidtech.api_gunungcondongcom.service.impl;
 
+import com.hafidtech.api_gunungcondongcom.config.JwtProvider;
 import com.hafidtech.api_gunungcondongcom.exception.AppException;
-import com.hafidtech.api_gunungcondongcom.exception.BadRequestException;
-import com.hafidtech.api_gunungcondongcom.model.role.Role;
-import com.hafidtech.api_gunungcondongcom.model.role.RoleName;
+import com.hafidtech.api_gunungcondongcom.exception.UserException;
+import com.hafidtech.api_gunungcondongcom.model.user.role.Role;
+import com.hafidtech.api_gunungcondongcom.model.user.role.RoleName;
 import com.hafidtech.api_gunungcondongcom.model.user.User;
 import com.hafidtech.api_gunungcondongcom.repository.RoleRepository;
 import com.hafidtech.api_gunungcondongcom.repository.UserRepository;
-import com.hafidtech.api_gunungcondongcom.response.ApiResponse;
 import com.hafidtech.api_gunungcondongcom.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,12 +21,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private RoleRepository roleRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private JwtProvider jwtProvider;
 
     @Override
     public User addUser(User user) {
@@ -46,5 +46,17 @@ public class UserServiceImpl implements UserService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
+    }
+
+    @Override
+    public User findUserProfileByJwt(String jwt) throws UserException {
+        String email = jwtProvider.getEmailFromToken(jwt);
+
+        User user = userRepository.findByEmail(email);
+
+        if (user == null) {
+            throw new UserException("user not found with email" + email);
+        }
+        return user;
     }
 }

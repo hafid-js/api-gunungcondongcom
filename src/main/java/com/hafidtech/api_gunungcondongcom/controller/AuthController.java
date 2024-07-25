@@ -41,7 +41,7 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
 
-    @PostMapping("/signup")
+    @PostMapping("/user/signup")
     @ResponseBody
     public ResponseEntity<AuthResponse> addUser(@Valid @RequestBody User user) throws UserException {
 
@@ -59,6 +59,25 @@ public class AuthController {
         return new ResponseEntity<AuthResponse>(authResponse,HttpStatus.CREATED);
     }
 
+
+    @PostMapping("/admin/signup")
+    public ResponseEntity<Object> addAdmin(@Valid @RequestBody User user) throws UserException {
+        if (userRepository.existsByUsername(user.getUsername())) {
+            throw new UserException("Username is already used with another account");
+        }
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new UserException("Email is already used with another account");
+        }
+        User newUser = userService.addAdmin(user);
+
+        AuthResponse authResponse = new AuthResponse();
+        authResponse.setUser(newUser);
+        authResponse.setMessage("Success Add Admin!");
+
+        return new ResponseEntity<>(authResponse, HttpStatus.CREATED);
+    }
+
+
     @PostMapping("/signin")
     public ResponseEntity<LoginResponse> loginUserHandler(@Valid @RequestBody LoginRequest loginRequest) {
         String username = loginRequest.getEmail();
@@ -75,6 +94,7 @@ public class AuthController {
 
         return new ResponseEntity<LoginResponse>(loginResponse, HttpStatus.OK);
     }
+
 
 
     private Authentication authenticate(String username, String password) {

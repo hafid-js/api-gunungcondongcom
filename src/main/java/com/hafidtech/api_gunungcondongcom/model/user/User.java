@@ -3,8 +3,7 @@ package com.hafidtech.api_gunungcondongcom.model.user;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hafidtech.api_gunungcondongcom.model.audit.DateAudit;
-import com.hafidtech.api_gunungcondongcom.model.role.Role;
-import com.hafidtech.api_gunungcondongcom.model.user.Address;
+import com.hafidtech.api_gunungcondongcom.model.user.role.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -12,7 +11,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.NaturalId;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;

@@ -1,5 +1,6 @@
 package com.hafidtech.api_gunungcondongcom.service;
 
+import com.hafidtech.api_gunungcondongcom.exception.UserException;
 import com.hafidtech.api_gunungcondongcom.model.user.User;
 
 public interface UserService {
@@ -7,4 +8,5 @@ public interface UserService {
 
     User addAdmin(User user);
 
+    User findUserProfileByJwt(String jwt) throws UserException;
 }
