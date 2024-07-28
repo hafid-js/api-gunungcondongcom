@@ -34,25 +34,29 @@ public class User extends DateAudit {
     private Long id;
 
     @NotBlank
-    @Size(max = 40)
+    @Size(min=3, max = 20)
+    @Column(length = 20)
     private String firstName;
 
     @NotBlank
-    @Size(max = 40)
+    @Size(min=3, max = 20)
+    @Column(length = 20)
     private String lastName;
 
     @NotBlank
-    @Size(max = 15)
+    @Size(min=5, max = 20)
+    @Column(length = 20)
     private String username;
 
     @NotBlank
-    @Size(max = 40)
+    @Size(min=10, max = 50)
     @Email
+    @Column(length = 50)
     private String email;
 
     @NotBlank
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Size(max = 100)
+    @Size(min=5, max = 255)
     private String password;
 
 
@@ -61,6 +65,8 @@ public class User extends DateAudit {
     @JsonIgnore
     private Address address;
 
+    @Size(min = 10, max = 15)
+    @Column(length = 15)
     private String phone;
 
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)

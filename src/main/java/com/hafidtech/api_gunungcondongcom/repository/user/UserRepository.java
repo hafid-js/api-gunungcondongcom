@@ -1,4 +1,4 @@
-package com.hafidtech.api_gunungcondongcom.repository;
+package com.hafidtech.api_gunungcondongcom.repository.user;
 
 import com.hafidtech.api_gunungcondongcom.model.user.User;
 import jakarta.validation.constraints.NotBlank;

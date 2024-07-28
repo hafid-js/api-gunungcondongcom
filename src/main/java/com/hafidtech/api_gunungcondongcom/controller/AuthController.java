@@ -1,12 +1,10 @@
 package com.hafidtech.api_gunungcondongcom.controller;
 
 import com.hafidtech.api_gunungcondongcom.config.JwtProvider;
-import com.hafidtech.api_gunungcondongcom.exception.BadRequestException;
 import com.hafidtech.api_gunungcondongcom.exception.UserException;
 import com.hafidtech.api_gunungcondongcom.model.user.User;
-import com.hafidtech.api_gunungcondongcom.repository.UserRepository;
+import com.hafidtech.api_gunungcondongcom.repository.user.UserRepository;
 import com.hafidtech.api_gunungcondongcom.request.LoginRequest;
-import com.hafidtech.api_gunungcondongcom.response.ApiResponse;
 import com.hafidtech.api_gunungcondongcom.response.AuthResponse;
 import com.hafidtech.api_gunungcondongcom.response.LoginResponse;
 import com.hafidtech.api_gunungcondongcom.service.UserService;
@@ -22,8 +20,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-import java.awt.*;
 
 @RestController
 @RequestMapping("/api/auth")

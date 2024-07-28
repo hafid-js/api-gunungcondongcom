@@ -1,9 +1,11 @@
 package com.hafidtech.api_gunungcondongcom.model.resident;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -22,8 +24,11 @@ public class Education {
     private Long id;
 
     @NotBlank
+    @Size(min = 3, max = 30)
+    @Column(length = 30)
     private String education;
 
     @OneToMany(mappedBy = "education", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Resident> resident;
 }

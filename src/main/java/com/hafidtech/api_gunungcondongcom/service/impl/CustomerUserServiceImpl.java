@@ -1,7 +1,7 @@
 package com.hafidtech.api_gunungcondongcom.service.impl;
 
 import com.hafidtech.api_gunungcondongcom.model.user.User;
-import com.hafidtech.api_gunungcondongcom.repository.UserRepository;
+import com.hafidtech.api_gunungcondongcom.repository.user.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

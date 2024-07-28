@@ -1,7 +1,6 @@
 package com.hafidtech.api_gunungcondongcom.config;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -40,9 +39,18 @@ public class JwtValidator extends OncePerRequestFilter {
                 Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, auths);
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            } catch (Exception e) {
-                throw new BadCredentialsException("invalid token... from jwt validator");
-
+//            } catch (Exception e) {
+//                throw new BadCredentialsException("invalid token... from jwt validator");
+            } catch (MalformedJwtException ex) {
+                throw new BadCredentialsException("Invalid JWT token");
+            } catch (ExpiredJwtException ex) {
+                throw new BadCredentialsException("Expired JWT token");
+            } catch (UnsupportedJwtException ex) {
+                throw new BadCredentialsException("Unsupported JWT token");
+            } catch (IllegalArgumentException ex) {
+                throw new BadCredentialsException("JWT claims string is empty");
+            } catch (SignatureException e) {
+                throw new BadCredentialsException("there is an error with the signature of you token ");
             }
         }
 

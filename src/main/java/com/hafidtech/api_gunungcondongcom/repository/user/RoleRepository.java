@@ -1,4 +1,4 @@
-package com.hafidtech.api_gunungcondongcom.repository;
+package com.hafidtech.api_gunungcondongcom.repository.user;
 
 import com.hafidtech.api_gunungcondongcom.model.user.role.Role;
 import com.hafidtech.api_gunungcondongcom.model.user.role.RoleName;

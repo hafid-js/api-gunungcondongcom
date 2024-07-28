@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.hafidtech.api_gunungcondongcom.model.user.Address;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
@@ -26,12 +27,18 @@ public class RW {
     private Long id;
 
     @NotBlank
+    @Size(min = 3, max = 3)
+    @Column(length = 3)
     private String rw;
 
     @NotBlank
+    @Size(min = 3, max = 50)
+    @Column(length = 50)
+    @JsonIgnore
     private String leader;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "id_hemlet")
     private Hemlet hemlet;
 
@@ -39,5 +46,6 @@ public class RW {
     private List<RT> rt;
 
     @OneToMany(mappedBy = "rw", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Resident> resident;
 }
