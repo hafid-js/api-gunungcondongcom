@@ -31,7 +31,6 @@ public class RT {
     private String rt;
 
     @NotBlank
-    @JsonIgnore
     @Size(min = 3, max = 50)
     @Column(length = 50)
     private String leader;

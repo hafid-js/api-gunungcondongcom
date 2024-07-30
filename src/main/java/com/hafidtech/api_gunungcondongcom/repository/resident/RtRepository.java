@@ -1,7 +1,5 @@
 package com.hafidtech.api_gunungcondongcom.repository.resident;
 
-import com.hafidtech.api_gunungcondongcom.model.resident.Gender;
-import com.hafidtech.api_gunungcondongcom.model.resident.Hemlet;
 import com.hafidtech.api_gunungcondongcom.model.resident.RT;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -31,12 +31,12 @@ public class Hemlet {
     private String hemlet;
 
     @NotBlank
-    @JsonIgnore
     @Size(min = 3, max = 50)
     @Column(length = 50)
     private String leader;
 
     @OneToMany(mappedBy = "hemlet", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<RW> rw;
 
     @OneToMany(mappedBy = "hemlet", cascade = CascadeType.ALL, orphanRemoval = true)

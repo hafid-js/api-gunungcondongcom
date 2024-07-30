@@ -51,12 +51,10 @@ public class Resident extends UserDateAudit {
     private Hemlet hemlet;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "rw_id")
     private RW rw;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "rt_id")
     private RT rt;
 

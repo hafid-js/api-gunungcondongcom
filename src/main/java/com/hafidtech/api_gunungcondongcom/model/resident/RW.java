@@ -34,15 +34,15 @@ public class RW {
     @NotBlank
     @Size(min = 3, max = 50)
     @Column(length = 50)
-    @JsonIgnore
     private String leader;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "id_hemlet")
+    @JsonIgnore
     private Hemlet hemlet;
 
     @OneToMany(mappedBy = "rw", cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.LAZY)
+    @JsonIgnore
     private List<RT> rt;
 
     @OneToMany(mappedBy = "rw", cascade = CascadeType.ALL, orphanRemoval = true)

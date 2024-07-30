@@ -1,6 +1,7 @@
 package com.hafidtech.api_gunungcondongcom.config;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -62,5 +63,10 @@ public class AppConfig {
         return new BCryptPasswordEncoder();
     }
 
+
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
+    }
 
 }

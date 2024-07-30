@@ -1,15 +1,10 @@
 package com.hafidtech.api_gunungcondongcom.service.impl;
 
-import com.hafidtech.api_gunungcondongcom.exception.AppException;
-import com.hafidtech.api_gunungcondongcom.exception.ResidentException;
 import com.hafidtech.api_gunungcondongcom.exception.ResourceNotFoundException;
 import com.hafidtech.api_gunungcondongcom.model.resident.*;
-import com.hafidtech.api_gunungcondongcom.model.user.role.Role;
-import com.hafidtech.api_gunungcondongcom.model.user.role.RoleName;
 import com.hafidtech.api_gunungcondongcom.repository.resident.*;
 import com.hafidtech.api_gunungcondongcom.request.ResidentRequest;
 import com.hafidtech.api_gunungcondongcom.response.PagedResponse;
-import com.hafidtech.api_gunungcondongcom.response.ResidentResponse;
 import com.hafidtech.api_gunungcondongcom.service.ResidentService;
 import com.hafidtech.api_gunungcondongcom.utils.AppConstants;
 import org.apache.coyote.BadRequestException;
@@ -18,19 +13,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 @Service
 public class ResidentServiceImpl implements ResidentService {
-
-    @Autowired
-    private HemletRepository hemletRepository;
     @Autowired
     private RwRepository rwRepository;
     @Autowired
@@ -47,6 +36,9 @@ public class ResidentServiceImpl implements ResidentService {
     private BloodRepository bloodRepository;
     @Autowired
     private ResidentRepository residentRepository;
+
+    @Autowired
+    private HemletRepository hemletRepository;
 
     @Override
     public Resident addResident(ResidentRequest request) {
@@ -79,6 +71,12 @@ public class ResidentServiceImpl implements ResidentService {
         return residentRepository.save(resident);
     }
 
+    private int number;
+    private int size;
+    private long totalElements;
+    private int totalPages;
+    private boolean lastPage;
+
 
     @Override
     public PagedResponse<Resident> getAllResidents(int page, int size) throws BadRequestException {
@@ -92,7 +90,6 @@ public class ResidentServiceImpl implements ResidentService {
         return new PagedResponse<>(content, residents.getNumber(), residents.getSize(), residents.getTotalElements(), residents.getTotalPages(), residents.isLast());
 
     }
-
 
     private void validatePageNumberAndSize(int page, int size) throws BadRequestException {
         if (page < 0) {
