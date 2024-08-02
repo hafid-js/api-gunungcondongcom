@@ -15,7 +15,9 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class Blood {
+
     @Id
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

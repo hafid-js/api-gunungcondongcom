@@ -6,6 +6,8 @@ import com.hafidtech.api_gunungcondongcom.exception.UserException;
 import com.hafidtech.api_gunungcondongcom.model.user.role.Role;
 import com.hafidtech.api_gunungcondongcom.model.user.role.RoleName;
 import com.hafidtech.api_gunungcondongcom.model.user.User;
+import com.hafidtech.api_gunungcondongcom.registration.token.VerificationToken;
+import com.hafidtech.api_gunungcondongcom.registration.token.VerificationTokenRepository;
 import com.hafidtech.api_gunungcondongcom.repository.user.RoleRepository;
 import com.hafidtech.api_gunungcondongcom.repository.user.UserRepository;
 import com.hafidtech.api_gunungcondongcom.service.UserService;
@@ -14,7 +16,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -27,6 +31,9 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JwtProvider jwtProvider;
+
+    @Autowired
+    private VerificationTokenRepository tokenRepository;
 
     @Override
     public User addUser(User user) {
@@ -46,6 +53,41 @@ public class UserServiceImpl implements UserService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
+    }
+
+    @Override
+    public void saveUserVerificationToken(User theUser, String token) {
+        var verificationToken = new VerificationToken(token, theUser);
+        tokenRepository.save(verificationToken);
+    }
+
+    @Override
+    public VerificationToken generateNewVerificationToken(String oldToken) {
+        VerificationToken verificationToken = tokenRepository.findByToken(oldToken);
+        var tokenExpirationTime = new VerificationToken();
+        verificationToken.setToken(UUID.randomUUID().toString());
+        verificationToken.setExpirationTime(tokenExpirationTime.getTokenExpirationTime());
+        return tokenRepository.save(verificationToken);
+    }
+
+    @Override
+    public String validateToken(String theToken) {
+        VerificationToken token = tokenRepository.findByToken(theToken);
+        if (token == null) {
+            return "Invalid verification token";
+        }
+
+        User user = token.getUser();
+        Calendar calendar = Calendar.getInstance();
+        if ((token.getExpirationTime().getTime() - calendar.getTime().getTime()) <= 0) {
+//            tokenRepository.delete(token);
+            return "Verification link already expired," +
+                    " Please, click the link below to receive a new verification link";
+        }
+
+        user.setEnabled(true);
+        userRepository.save(user);
+        return "valid";
     }
 
     @Override

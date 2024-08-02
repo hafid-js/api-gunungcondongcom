@@ -7,6 +7,7 @@ import com.hafidtech.api_gunungcondongcom.model.user.role.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -76,13 +77,20 @@ public class User extends DateAudit {
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private List<Role> role;
 
+    private boolean isEnabled = false;
 
-    public User(String firstName, String lastName, String username, String email, String password) {
+
+    public User(Long id, String firstName, String lastName, String username, String email, String password, Address address, String phone, List<Role> role, boolean isEnabled) {
+        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
         this.email = email;
         this.password = password;
+        this.address = address;
+        this.phone = phone;
+        this.role = role;
+        this.isEnabled = isEnabled;
     }
 
     public List<Role> getRole() {
