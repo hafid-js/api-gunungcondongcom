@@ -1,8 +1,10 @@
 package com.hafidtech.api_gunungcondongcom.registration.password;
 
+import com.hafidtech.api_gunungcondongcom.exception.UserException;
 import com.hafidtech.api_gunungcondongcom.model.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
 import java.util.Optional;
@@ -13,7 +15,13 @@ public class PasswordResetTokenService {
 
     private final PasswordResetTokenRepository passwordResetTokenRepository;
 
-    public void createPasswordResetTokenForUser(User user, String passwordToken){
+    @Transactional
+    public void createPasswordResetTokenForUser(User user, String passwordToken) throws UserException {
+        PasswordResetToken userId = passwordResetTokenRepository.findByUserId(user.getId());
+        if (userId != null) {
+//            passwordResetTokenRepository.deleteByUserId(user.getId());
+            throw new UserException ("we have sent, check your email again");
+        }
         PasswordResetToken passwordResetToken = new PasswordResetToken(passwordToken, user);
         passwordResetTokenRepository.save(passwordResetToken);
     }

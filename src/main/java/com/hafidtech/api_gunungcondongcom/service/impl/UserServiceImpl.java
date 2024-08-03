@@ -6,6 +6,7 @@ import com.hafidtech.api_gunungcondongcom.exception.UserException;
 import com.hafidtech.api_gunungcondongcom.model.user.role.Role;
 import com.hafidtech.api_gunungcondongcom.model.user.role.RoleName;
 import com.hafidtech.api_gunungcondongcom.model.user.User;
+import com.hafidtech.api_gunungcondongcom.registration.password.PasswordResetTokenService;
 import com.hafidtech.api_gunungcondongcom.registration.token.VerificationToken;
 import com.hafidtech.api_gunungcondongcom.registration.token.VerificationTokenRepository;
 import com.hafidtech.api_gunungcondongcom.repository.user.RoleRepository;
@@ -15,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -31,9 +29,10 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JwtProvider jwtProvider;
-
     @Autowired
     private VerificationTokenRepository tokenRepository;
+    @Autowired
+    private PasswordResetTokenService passwordResetTokenService;
 
     @Override
     public User addUser(User user) {
@@ -100,5 +99,32 @@ public class UserServiceImpl implements UserService {
             throw new UserException("user not found with email" + email);
         }
         return user;
+    }
+
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return Optional.ofNullable(userRepository.findByEmail(email));
+    }
+
+    @Override
+    public void createPasswordResetTokenForUser(User user, String passwordToken) throws UserException {
+        passwordResetTokenService.createPasswordResetTokenForUser(user, passwordToken);
+    }
+
+    @Override
+    public String validatePasswordResetToken(String passwordResetToken) {
+        return passwordResetTokenService.validatePasswordResetToken(passwordResetToken);
+    }
+
+    @Override
+    public User findUserProfileByToken(String passwordResetToken) {
+        return passwordResetTokenService.findUserByPasswordToken(passwordResetToken).get();
+    }
+
+    @Override
+    public void resetUserPassword(User user, String newPassword) {
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 }

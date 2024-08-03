@@ -31,6 +31,7 @@ public class AppConfig {
                         .requestMatchers(HttpMethod.POST, "/api/admin/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auth/verifyEmail/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auth/resend-verification-token/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auth/reset-password/**").permitAll()
                         .requestMatchers("/api/**").authenticated().anyRequest().permitAll()
                 )
                 .addFilterBefore(new JwtValidator(), BasicAuthenticationFilter.class).csrf().disable()
