@@ -8,7 +8,9 @@ import com.hafidtech.api_gunungcondongcom.exception.LoginException;
 import com.hafidtech.api_gunungcondongcom.exception.UserException;
 import com.hafidtech.api_gunungcondongcom.model.user.User;
 import com.hafidtech.api_gunungcondongcom.registration.password.PasswordResetRequest;
+import com.hafidtech.api_gunungcondongcom.registration.password.PasswordResetToken;
 import com.hafidtech.api_gunungcondongcom.registration.password.PasswordResetTokenRepository;
+import com.hafidtech.api_gunungcondongcom.registration.password.PasswordResetTokenService;
 import com.hafidtech.api_gunungcondongcom.registration.token.VerificationToken;
 import com.hafidtech.api_gunungcondongcom.registration.token.VerificationTokenRepository;
 import com.hafidtech.api_gunungcondongcom.repository.user.UserRepository;
@@ -27,6 +29,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Calendar;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -64,6 +68,9 @@ public class AuthController {
     private HttpServletRequest servletRequest;
     @Autowired
     private PasswordResetTokenRepository passwordResetTokenRepository;
+
+    @Autowired
+    private PasswordResetTokenService passwordResetTokenService;
 
     @PostMapping("/user/signup")
     @ResponseBody
@@ -179,15 +186,42 @@ public class AuthController {
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
+    @Transactional
     @PostMapping("/password-reset-request")
     public String resetPasswordRequest(@RequestBody PasswordResetRequest passwordResetRequest,
                                        final HttpServletRequest request) throws MessagingException, UnsupportedEncodingException, UserException {
         Optional<User> user = userService.findByEmail(passwordResetRequest.getEmail());
+        PasswordResetToken userPasswordReset = passwordResetTokenRepository.findByUserId(user.get().getId());
         String passwordResetUrl = "";
+
         if (user.isPresent()) {
-            String passwordResetToken = UUID.randomUUID().toString();
-            userService.createPasswordResetTokenForUser(user.get(), passwordResetToken);
-            passwordResetUrl = passwordResetEmailLink(user.get(), applicationUrl(request), passwordResetToken);
+            if (userPasswordReset == null) {
+                String passwordResetToken = UUID.randomUUID().toString();
+                userService.createPasswordResetTokenForUser(user.get(), passwordResetToken);
+                passwordResetUrl = passwordResetEmailLink(user.get(), applicationUrl(request), passwordResetToken);
+
+            } else {
+                if (userPasswordReset.isRequestNonLocked()) {
+                    if (userPasswordReset.getRequestAttempt() < passwordResetTokenService.MAX_REQUEST_ATTEMPTS - 1) {
+                        passwordResetTokenService.increaseRequestAttempts(userPasswordReset.getUser().getId());
+                        String passwordResetToken = UUID.randomUUID().toString();
+                        userService.createPasswordResetTokenForUser(user.get(), passwordResetToken);
+                        passwordResetUrl = passwordResetEmailLink(user.get(), applicationUrl(request), passwordResetToken);
+                    } else {
+                        if(userPasswordReset.getLockTime() == null) {
+                            passwordResetTokenService.lock(userPasswordReset);
+                            throw new UserException("kintil");
+                        } else {
+                            passwordResetTokenService.unlockWhenTimeExpired(userPasswordReset);
+                            throw new UserException("kintil lah");
+                        }
+
+                    }
+                }
+
+//                passwordResetTokenService.unlockWhenTimeExpired(userPasswordReset);
+            }
+
         }
         return passwordResetUrl;
     }
@@ -204,11 +238,20 @@ public class AuthController {
     public String resetPassword(@RequestBody PasswordResetRequest passwordResetRequest,
                                 @RequestParam("token") String passwordResetToken) {
         String tokenValidationResult = userService.validatePasswordResetToken(passwordResetToken);
-        if (!tokenValidationResult.equalsIgnoreCase("valid")) {
-            passwordResetTokenRepository.deleteByToken(passwordResetToken);
+        PasswordResetToken token = passwordResetTokenRepository.findByToken(passwordResetToken);
+        Calendar calendar = Calendar.getInstance();
+
+        if (token == null){
             return "Invalid password reset token";
         }
 
+        if ((token.getExpirationTime().getTime() - calendar.getTime().getTime()) <= 0) {
+            return "Link already expired, resend link";
+        }
+
+        if (!tokenValidationResult.equalsIgnoreCase("valid")) {
+            return "Invalid password reset token";
+        }
         User user = userService.findUserProfileByToken(passwordResetToken);
         if (user != null) {
             userService.resetUserPassword(user, passwordResetRequest.getNewPassword());
