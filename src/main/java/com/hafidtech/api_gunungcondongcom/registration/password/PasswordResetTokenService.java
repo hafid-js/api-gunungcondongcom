@@ -17,7 +17,7 @@ import java.util.Optional;
 public class PasswordResetTokenService {
 
     public static final int MAX_REQUEST_ATTEMPTS = 3;
-    private static final long LOCK_TIME_DURATION = 1 * 60 * 1000; // 2 minutes
+    private static final long LOCK_TIME_DURATION = 1 * 60 * 1000; //  2 minutes
 
     @Autowired
     private final PasswordResetTokenRepository passwordResetTokenRepository;
@@ -100,7 +100,7 @@ public class PasswordResetTokenService {
         long lockTimeInMillis = userPasswordReset.getLockTime().getTime();
         long currentTimeInMillis = System.currentTimeMillis();
 
-        if (lockTimeInMillis + LOCK_TIME_DURATION > currentTimeInMillis) {
+        if (currentTimeInMillis > lockTimeInMillis + LOCK_TIME_DURATION) {
             userPasswordReset.setRequestNonLocked(true);
             userPasswordReset.setLockTime(null);
             userPasswordReset.setRequestAttempt(0);

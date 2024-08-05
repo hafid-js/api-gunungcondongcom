@@ -210,10 +210,10 @@ public class AuthController {
                     } else {
                         if(userPasswordReset.getLockTime() == null) {
                             passwordResetTokenService.lock(userPasswordReset);
-                            throw new UserException("kintil");
+                            throw new UserException("request too frequently, We locked your request, wait another 2 minutes before you can change your password again.");
                         } else {
                             passwordResetTokenService.unlockWhenTimeExpired(userPasswordReset);
-                            throw new UserException("kintil lah");
+                            throw new UserException("request too frequently, We locked your request, wait another 2 minutes before you can change your password again.");
                         }
 
                     }
